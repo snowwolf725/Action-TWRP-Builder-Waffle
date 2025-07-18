@@ -149,6 +149,11 @@ jobs:
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
       continue-on-error: true
 
+    - name: Applying OTA installer patch
+      run: |
+        cd bootable/recovery
+        git apply 001-ota-install-mod.patch
+
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
       with:
