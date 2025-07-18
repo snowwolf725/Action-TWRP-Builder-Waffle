@@ -159,7 +159,8 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
-        cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP.img
+        TIMESTAMP=$(date +"%Y%m%d")
+        cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP-OP12-$TIMESTAMP.img
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Applying OTA installer patch
@@ -173,7 +174,8 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
-        cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP-Mod.img
+        TIMESTAMP=$(date +"%Y%m%d")
+        cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP-OP13-$TIMESTAMP-Mod.img
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Upload to Release
