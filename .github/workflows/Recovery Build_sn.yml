@@ -166,7 +166,7 @@ jobs:
     - name: Applying OTA installer patch
       run: |
         cd bootable/recovery
-        git apply 001-ota-install-mod.patch
+        git apply ${GITHUB_WORKSPACE}/scripts/001-ota-install-mod.patch
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Building recovery mod
