@@ -1,0 +1,34 @@
+diff --git a/partitionmanager.cpp b/partitionmanager.cpp
+index 31f7882..68f2878 100755
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -351,13 +351,13 @@ parse:
+ 		if (fstab_line[0] == '#') continue;
+ 
+ 		if (parse_userdata) {
+-			if (strstr(fstab_line, "/metadata") && !strstr(fstab_line, "/data")) {
++			/*if (strstr(fstab_line, "/metadata") && !strstr(fstab_line, "/data")) {
+ 				if (meta) {
+ 					Partitions.erase(std::find(Partitions.begin(), Partitions.end(), meta));
+ 					delete meta;
+ 					meta = NULL;
+ 				}
+-			} else if (strstr(fstab_line, "/data")) {
++			} else */if (strstr(fstab_line, "/data")) {
+ 				if (data) {
+ 					Partitions.erase(std::find(Partitions.begin(), Partitions.end(), data));
+ 					delete data;
+@@ -397,9 +397,13 @@ clear:
+ 			if (Find_Partition_By_Path(mapit->first) == NULL) {
+ 				TWPartition* partition = new TWPartition();
+ 				if (partition->Process_Fstab_Line(mapit->second.fstab_line, Display_Error, NULL))
++				{
+ 					Partitions.push_back(partition);
++				}
+ 				else
++				{
+ 					delete partition;
++				}
+ 			}
+ 			if (mapit->second.fstab_line) free(mapit->second.fstab_line);
+ 			mapit->second.fstab_line = NULL;
