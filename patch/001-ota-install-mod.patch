@@ -1,8 +1,8 @@
 diff --git a/install/install.cpp b/install/install.cpp
-index 7c48c69..175e83a 100755
+index 7c48c69..caa67ef 100755
 --- a/install/install.cpp
 +++ b/install/install.cpp
-@@ -266,13 +266,33 @@ bool SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
+@@ -266,13 +266,36 @@ bool SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
      return false;
    }
    long payload_offset = payload_entry.offset;
@@ -18,10 +18,13 @@ index 7c48c69..175e83a 100755
 +  if (!ReadMetadataFromPackage(zip, &metadata)) {
 +    LOG(ERROR) << "Failed to parse metadata in the zip file";
 +  }
-+  bool isOP12, isInc, isVaildOTA = false;
++  bool isOP12 = false, isInc = false, isVaildOTA = false;
 +  if(metadata.count("oplus_project_numbers") != 0) {
 +    isOP12 = (get_value(metadata, "oplus_project_numbers") == "22877") | (get_value(metadata, "oplus_project_numbers") == "22825");
 +    isInc = metadata.count("pre-build") != 0;
++  }
++  if(isOP12 && isInc == false) {
++    isVaildOTA = true;
 +  }
 +  if(isVaildOTA) {
 +    *cmd = {
@@ -44,10 +47,10 @@ index 7c48c69..175e83a 100755
  }
  
 diff --git a/twrpinstall/install.cpp b/twrpinstall/install.cpp
-index d270d26..6929527 100755
+index d270d26..c861ee2 100755
 --- a/twrpinstall/install.cpp
 +++ b/twrpinstall/install.cpp
-@@ -257,13 +257,33 @@ int SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
+@@ -257,13 +257,36 @@ int SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
      return INSTALL_CORRUPT;
    }
    long payload_offset = payload_entry.offset;
@@ -63,10 +66,13 @@ index d270d26..6929527 100755
 +  if (!ReadMetadataFromPackage(zip, &metadata)) {
 +    LOG(ERROR) << "Failed to parse metadata in the zip file";
 +  }
-+  bool isOP12, isInc, isVaildOTA = false;
++  bool isOP12 = false, isInc = false, isVaildOTA = false;
 +  if(metadata.count("oplus_project_numbers") != 0) {
 +    isOP12 = (get_value(metadata, "oplus_project_numbers") == "22877") | (get_value(metadata, "oplus_project_numbers") == "22825");
 +    isInc = metadata.count("pre-build") != 0;
++  }
++  if(isOP12 && isInc == false) {
++    isVaildOTA = true;
 +  }
 +  if(isVaildOTA) {
 +    *cmd = {
@@ -89,10 +95,10 @@ index d270d26..6929527 100755
  }
  
 diff --git a/twrpinstall/installcommand.cpp b/twrpinstall/installcommand.cpp
-index e4e5366..ff84d38 100755
+index e4e5366..dba1acc 100755
 --- a/twrpinstall/installcommand.cpp
 +++ b/twrpinstall/installcommand.cpp
-@@ -244,14 +244,40 @@ abupdate_binary_command(const char* path, int retry_count __unused,
+@@ -244,14 +244,43 @@ abupdate_binary_command(const char* path, int retry_count __unused,
      }
      // long payload_offset = Zip->GetEntryOffset(AB_OTA_PAYLOAD);
      long payload_offset = ab_ota_payload_entry.offset;
@@ -109,10 +115,13 @@ index e4e5366..ff84d38 100755
 +            metadata[line.substr(0, eq)] = line.substr(eq + 1);
 +        }
 +    }
-+    bool isOP12, isInc, isVaildOTA = false;
++    bool isOP12 = false, isInc = false, isVaildOTA = false;
 +    if(metadata.count("oplus_project_numbers") != 0) {
 +      isOP12 = (metadata["oplus_project_numbers"] == "22877") | (metadata["oplus_project_numbers"] == "22825");
 +      isInc = metadata.count("pre-build") != 0;
++    }
++    if(isOP12 && isInc == false) {
++      isVaildOTA = true;
 +    }
 +    if(isVaildOTA) {
 +      *cmd = {
