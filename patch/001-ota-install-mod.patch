@@ -1,81 +1,140 @@
 diff --git a/install/install.cpp b/install/install.cpp
-index 7c48c69..8a9bdc3 100755
+index 7c48c69..175e83a 100755
 --- a/install/install.cpp
 +++ b/install/install.cpp
-@@ -266,13 +266,21 @@ bool SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
+@@ -266,13 +266,33 @@ bool SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
      return false;
    }
    long payload_offset = payload_entry.offset;
-+  *cmd = {
-+    "/system/bin/flashtool.sh",
-+    package,
-+    android::base::StringPrintf("%ld", payload_offset),
-+    std::string(payload_properties.begin(), payload_properties.end()),
-+    android::base::StringPrintf("%d", status_fd),
-+  };
-+  /*
-   *cmd = {
-     "/system/bin/update_engine_sideload",
-     "--payload=file://" + package,
-     android::base::StringPrintf("--offset=%ld", payload_offset),
-     "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
-     android::base::StringPrintf("--status_fd=%d", status_fd),
+-  *cmd = {
+-    "/system/bin/update_engine_sideload",
+-    "--payload=file://" + package,
+-    android::base::StringPrintf("--offset=%ld", payload_offset),
+-    "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
+-    android::base::StringPrintf("--status_fd=%d", status_fd),
 -  };
-+  };*/
++  std::map<std::string, std::string> metadata;
++
++  if (!ReadMetadataFromPackage(zip, &metadata)) {
++    LOG(ERROR) << "Failed to parse metadata in the zip file";
++  }
++  bool isOP12, isInc, isVaildOTA = false;
++  if(metadata.count("oplus_project_numbers") != 0) {
++    isOP12 = (get_value(metadata, "oplus_project_numbers") == "22877") | (get_value(metadata, "oplus_project_numbers") == "22825");
++    isInc = metadata.count("pre-build") != 0;
++  }
++  if(isVaildOTA) {
++    *cmd = {
++      "/system/bin/flashtool.sh",
++      package,
++      android::base::StringPrintf("%ld", payload_offset),
++      std::string(payload_properties.begin(), payload_properties.end()),
++      android::base::StringPrintf("%d", status_fd),
++    };
++  } else {
++    *cmd = {
++      "/system/bin/update_engine_sideload",
++      "--payload=file://" + package,
++      android::base::StringPrintf("--offset=%ld", payload_offset),
++      "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
++      android::base::StringPrintf("--status_fd=%d", status_fd),
++    };
++  }
    return true;
  }
  
 diff --git a/twrpinstall/install.cpp b/twrpinstall/install.cpp
-index d270d26..cd411fe 100755
+index d270d26..6929527 100755
 --- a/twrpinstall/install.cpp
 +++ b/twrpinstall/install.cpp
-@@ -257,13 +257,21 @@ int SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
+@@ -257,13 +257,33 @@ int SetUpAbUpdateCommands(const std::string& package, ZipArchiveHandle zip, int
      return INSTALL_CORRUPT;
    }
    long payload_offset = payload_entry.offset;
-+  *cmd = {
-+    "/system/bin/flashtool.sh",
-+    package,
-+    android::base::StringPrintf("%ld", payload_offset),
-+    std::string(payload_properties.begin(), payload_properties.end()),
-+    android::base::StringPrintf("%d", status_fd),
-+  };
-+  /*
-   *cmd = {
-     "/system/bin/update_engine_sideload",
-     "--payload=file://" + package,
-     android::base::StringPrintf("--offset=%ld", payload_offset),
-     "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
-     android::base::StringPrintf("--status_fd=%d", status_fd),
+-  *cmd = {
+-    "/system/bin/update_engine_sideload",
+-    "--payload=file://" + package,
+-    android::base::StringPrintf("--offset=%ld", payload_offset),
+-    "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
+-    android::base::StringPrintf("--status_fd=%d", status_fd),
 -  };
-+  };*/
++  std::map<std::string, std::string> metadata;
++
++  if (!ReadMetadataFromPackage(zip, &metadata)) {
++    LOG(ERROR) << "Failed to parse metadata in the zip file";
++  }
++  bool isOP12, isInc, isVaildOTA = false;
++  if(metadata.count("oplus_project_numbers") != 0) {
++    isOP12 = (get_value(metadata, "oplus_project_numbers") == "22877") | (get_value(metadata, "oplus_project_numbers") == "22825");
++    isInc = metadata.count("pre-build") != 0;
++  }
++  if(isVaildOTA) {
++    *cmd = {
++      "/system/bin/flashtool.sh",
++      package,
++      android::base::StringPrintf("%ld", payload_offset),
++      std::string(payload_properties.begin(), payload_properties.end()),
++      android::base::StringPrintf("%d", status_fd),
++    };
++  } else {
++    *cmd = {
++      "/system/bin/update_engine_sideload",
++      "--payload=file://" + package,
++      android::base::StringPrintf("--offset=%ld", payload_offset),
++      "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
++      android::base::StringPrintf("--status_fd=%d", status_fd),
++    };
++  }
    return 0;
  }
  
 diff --git a/twrpinstall/installcommand.cpp b/twrpinstall/installcommand.cpp
-index e4e5366..0c73ad6 100755
+index e4e5366..ff84d38 100755
 --- a/twrpinstall/installcommand.cpp
 +++ b/twrpinstall/installcommand.cpp
-@@ -244,6 +244,14 @@ abupdate_binary_command(const char* path, int retry_count __unused,
+@@ -244,14 +244,40 @@ abupdate_binary_command(const char* path, int retry_count __unused,
      }
      // long payload_offset = Zip->GetEntryOffset(AB_OTA_PAYLOAD);
      long payload_offset = ab_ota_payload_entry.offset;
-+    *cmd = {
-+    	"/system/bin/flashtool.sh",
-+    	path,
-+    	android::base::StringPrintf("%ld", payload_offset),
-+    	std::string(payload_properties.begin(), payload_properties.end()),
-+    	android::base::StringPrintf("%d", status_fd),
-+    };
-+    /*
-     *cmd = {
+-    *cmd = {
++    std::string metadata_str;
++
++    if (!read_metadata_from_package(Zip, &metadata_str)) {
++      printf("Failed to parse metadata in the zip file");
++    }
++    std::map<std::string, std::string> metadata;
++    for (const std::string& line : android::base::Split(metadata_str, "\n")) {
++        size_t eq = line.find('=');
++        if (eq != std::string::npos) {
++            metadata[line.substr(0, eq)] = line.substr(eq + 1);
++        }
++    }
++    bool isOP12, isInc, isVaildOTA = false;
++    if(metadata.count("oplus_project_numbers") != 0) {
++      isOP12 = (metadata["oplus_project_numbers"] == "22877") | (metadata["oplus_project_numbers"] == "22825");
++      isInc = metadata.count("pre-build") != 0;
++    }
++    if(isVaildOTA) {
++      *cmd = {
++        "/system/bin/flashtool.sh",
++        path,
++        android::base::StringPrintf("%ld", payload_offset),
++        std::string(payload_properties.begin(), payload_properties.end()),
++        android::base::StringPrintf("%d", status_fd),
++      };
++    } else {
++      *cmd = {
          "/system/bin/update_engine_sideload",
-         android::base::StringPrintf("--payload=file://%s", path),
-@@ -252,6 +260,7 @@ abupdate_binary_command(const char* path, int retry_count __unused,
-                                    payload_properties.end()),
+-        android::base::StringPrintf("--payload=file://%s", path),
++	android::base::StringPrintf("--payload=file://%s", path),
+         android::base::StringPrintf("--offset=%ld", payload_offset),
+-        "--headers=" + std::string(payload_properties.begin(),
+-                                   payload_properties.end()),
++        "--headers=" + std::string(payload_properties.begin(), payload_properties.end()),
          android::base::StringPrintf("--status_fd=%d", status_fd),
-     };
-+    */
+-    };
++      };
++    }
      return INSTALL_SUCCESS;
  }
  
