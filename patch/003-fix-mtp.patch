@@ -16,3 +16,18 @@ index 31f7882..3fd80e6 100755
  		}
  		dat->Symlink_Path = dat->Storage_Path;
  		DataManager::SetValue("tw_storage_path", dat->Symlink_Path);
+
+diff --git a/variables.h b/variables.h
+index 3d43f81..79d7b4f 100755
+--- a/variables.h
++++ b/variables.h
+@@ -27,7 +27,7 @@
+ #define TW_MAIN_VERSION_STR       "3.7.1_12"
+ #define TW_VERSION_STR TW_MAIN_VERSION_STR PB_MAIN_BUILD
+ 
+-#define TW_STORAGE_PATH             "/data/recovery/"
++#define TW_STORAGE_PATH             "/sdcard/"
+ #define TW_USE_COMPRESSION_VAR      "tw_use_compression"
+ #define TW_FILENAME                 "tw_filename"
+ #define TW_ZIP_INDEX                "tw_zip_index"
+ 
