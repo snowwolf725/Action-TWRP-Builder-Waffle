@@ -157,11 +157,11 @@ jobs:
         swap-size-gb: 12
 
     - name: Building recovery
-      run: |
+      run: | 
         cd bootable/recovery
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
-        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-mtp.patch
+#        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-mtp.patch
         cd ../../
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
