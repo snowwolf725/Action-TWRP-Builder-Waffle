@@ -161,7 +161,6 @@ jobs:
         cd bootable/recovery
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
-#        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-mtp.patch
         cd ../../
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
@@ -171,6 +170,7 @@ jobs:
         cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP-OP12-$TIMESTAMP.img
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
+#        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-mtp.patch
 #    - name: Applying OTA installer patch
 #      run: |
 #        cd bootable/recovery
