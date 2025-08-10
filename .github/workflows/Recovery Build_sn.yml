@@ -43,7 +43,22 @@ on:
         description: 'BUILD_TARGET'
         required: true
         default: 'recovery'
-
+      PATCH_INSTALLET:
+        description: 'Patch recovery installer'
+        required: true
+        type: choice
+        default: 'true'
+        options:
+          - 'true'
+          - 'false'
+      BACKUP_METADATA:
+        description: 'allow backup metadata'
+        required: true
+        type: choice
+        default: 'true'
+        options:
+          - 'true'
+          - 'false'
 jobs:
   build:
     if: github.event.repository.owner.id == github.event.sender.id
@@ -159,7 +174,12 @@ jobs:
     - name: Building recovery
       run: | 
         cd bootable/recovery
-        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
+        if [[ "${{ github.event.inputs.PATCH_INSTALLER }}" == "true" ]]; then
+           git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
+        fi
+        if [[ "${{ github.event.inputs.BACKUP_METADATA }}" == "true" ]]; then
+           git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
+        fi
         cd ../../
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
