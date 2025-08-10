@@ -51,14 +51,14 @@ on:
         options:
           - 'true'
           - 'false'
-      BACKUP_METADATA:
-        description: 'allow backup metadata'
-        required: true
-        type: choice
-        default: 'true'
-        options:
-          - 'true'
-          - 'false'
+#      BACKUP_METADATA:
+#        description: 'allow backup metadata'
+#        required: true
+#        type: choice
+#        default: 'true'
+#        options:
+#          - 'true'
+#          - 'false'
 jobs:
   build:
     if: github.event.repository.owner.id == github.event.sender.id
