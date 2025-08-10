@@ -43,14 +43,14 @@ on:
         description: 'BUILD_TARGET'
         required: true
         default: 'recovery'
-      PATCH_INSTALLET:
-        description: 'Patch recovery installer'
-        required: true
-        type: choice
-        default: 'true'
-        options:
-          - 'true'
-          - 'false'
+#      PATCH_INSTALLET:
+#        description: 'Patch recovery installer'
+#        required: true
+#        type: choice
+#        default: 'true'
+#        options:
+#          - 'true'
+#          - 'false'
 
 #      BACKUP_METADATA:
 #        description: 'allow backup metadata'
