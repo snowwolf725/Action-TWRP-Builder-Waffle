@@ -174,12 +174,8 @@ jobs:
     - name: Building recovery
       run: | 
         cd bootable/recovery
-        if [[ "${{ github.event.inputs.PATCH_INSTALLER }}" == "true" ]]; then
-           git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
-        fi
-        if [[ "${{ github.event.inputs.BACKUP_METADATA }}" == "true" ]]; then
-           git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
-        fi
+        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
+        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
         cd ../../
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
