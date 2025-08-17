@@ -1,0 +1,14 @@
+diff --git a/MetadataCrypt.cpp b/MetadataCrypt.cpp
+index b978b95..a00923a 100644
+--- a/MetadataCrypt.cpp
++++ b/MetadataCrypt.cpp
+@@ -366,7 +366,8 @@ bool fscrypt_mount_metadata_encrypted(const std::string& blk_device, const std::
+     mount_via_fs_mgr(mount_point.c_str(), crypto_blkdev.c_str());
+     android::base::SetProperty("ro.crypto.fs_crypto_blkdev", crypto_blkdev);
+ 
+-    fs_mgr_unmount_all_data_mounts(crypto_blkdev); // Unmount after successfull checking mounting this may cause the post decryption not work correctly
++    if(false)
++      fs_mgr_unmount_all_data_mounts(crypto_blkdev); // Unmount after successfull checking mounting this may cause the post decryption not work correctly
+ 
+     // Record that there's at least one fstab entry with metadata encryption
+     if (!android::base::SetProperty("ro.crypto.metadata.enabled", "true")) {

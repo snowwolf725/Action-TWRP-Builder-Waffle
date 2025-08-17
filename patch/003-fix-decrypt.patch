@@ -1,0 +1,14 @@
+diff --git a/partition.cpp b/partition.cpp
+index 66a89228..ebf116ac 100755
+--- a/partition.cpp
++++ b/partition.cpp
+@@ -1737,6 +1737,9 @@ bool TWPartition::UnMount(bool Display_Error, int flags) {
+ 		if (umount("/system") == -1)
+ 			umount2("/system", MNT_DETACH);
+ 	}
++	if(Mount_Point == "/data" && Is_Mounted() && Is_Decrypted) {
++                return true;
++        }
+ 	if (Is_Mounted()) {
+ 		int never_unmount_system;
+ 
