@@ -177,6 +177,9 @@ jobs:
         cd bootable/recovery
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
+        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-decrypt.patch
+        cd ../../system/vold
+        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-decrypt2.patch
         cd ../../
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
@@ -185,24 +188,6 @@ jobs:
         echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
         cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP-OP12-$TIMESTAMP.img
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-
-#        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
-#        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-mtp.patch
-#    - name: Applying OTA installer patch
-#      run: |
-#        cd bootable/recovery
-#        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
-#      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-
-#    - name: Building recovery mod
-#      run: |
-#        source build/envsetup.sh
-#        export ALLOW_MISSING_DEPENDENCIES=true
-#        lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
-#        TIMESTAMP=$(date +"%Y%m%d")
-#        echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
-#        cp out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ../PBRP-OP12-$TIMESTAMP-Mod.img
-#      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
