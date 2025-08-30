@@ -125,41 +125,40 @@ jobs:
     - name: Clone Device Tree
       run: |
         cd android-recovery
-        git clone ${{ inputs.DEVICE_TREE_URL }} -b ${{ inputs.DEVICE_TREE_BRANCH }} ./device_tree
-        cd device_tree
-        echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
-
-    - name: Extracting variables from .mk file
-      run: |
-        cd android-recovery/device_tree
-        # Initialize variables
-        DEVICE_MAKEFILE=""
-        DEVICE_DIRECTORY=""
-        DEVICE_NAME=""
-        # Loop through each .mk file in the current directory
-        for file in *.mk; do
-            # Extract variables using sed
-            makefile=$(sed -n 's/^[[:space:]]*PRODUCT_NAME[[:space:]]*:=\s*\(.*\)/\1/p' "$file")
-            brand=$(sed -n 's/^[[:space:]]*PRODUCT_BRAND[[:space:]]*:=\s*\(.*\)/\1/p' "$file")
-            codename=$(sed -n 's/^[[:space:]]*PRODUCT_DEVICE[[:space:]]*:=\s*\(.*\)/\1/p' "$file")
-            if [[ -n "$makefile" && -n "$brand" && -n "$codename" ]]; then
-                DEVICE_MAKEFILE="$makefile"
-                DEVICE_DIRECTORY="device/$brand"
-                DEVICE_NAME="$codename"
-                echo "DEVICE_MAKEFILE=${DEVICE_MAKEFILE}" >> $GITHUB_ENV
-                echo "DEVICE_NAME=${DEVICE_NAME}" >> $GITHUB_ENV
-                echo "DEVICE_DIRECTORY=${DEVICE_DIRECTORY}" >> $GITHUB_ENV
-                break
-            fi
-        done
-        # Navigate to the parent directory
-        cd ../
-        # Create the necessary directories
-        echo "Creating directory: $DEVICE_DIRECTORY"
-        mkdir -p "$DEVICE_DIRECTORY"
-        # Move device_tree folder to device_directory and rename it to $DEVICE_NAME
-        echo "Moving device_tree to $DEVICE_DIRECTORY/$DEVICE_NAME"
-        mv device_tree "$DEVICE_DIRECTORY"/"$DEVICE_NAME"
+        git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
+        
+        
+#    - name: Extracting variables from .mk file
+#      run: |
+#        cd android-recovery/device_tree
+#        # Initialize variables
+#        DEVICE_MAKEFILE=""
+#        DEVICE_DIRECTORY=""
+#        DEVICE_NAME=""
+#        # Loop through each .mk file in the current directory
+#        for file in *.mk; do
+#            # Extract variables using sed
+#            makefile=$(sed -n 's/^[[:space:]]*PRODUCT_NAME[[:space:]]*:=\s*\(.*\)/\1/p' "$file")
+#            brand=$(sed -n 's/^[[:space:]]*PRODUCT_BRAND[[:space:]]*:=\s*\(.*\)/\1/p' "$file")
+#            codename=$(sed -n 's/^[[:space:]]*PRODUCT_DEVICE[[:space:]]*:=\s*\(.*\)/\1/p' "$file")
+#            if [[ -n "$makefile" && -n "$brand" && -n "$codename" ]]; then
+#                DEVICE_MAKEFILE="$makefile"
+#                DEVICE_DIRECTORY="device/$brand"
+#                DEVICE_NAME="$codename"
+#                echo "DEVICE_MAKEFILE=${DEVICE_MAKEFILE}" >> $GITHUB_ENV
+#                echo "DEVICE_NAME=${DEVICE_NAME}" >> $GITHUB_ENV
+#                echo "DEVICE_DIRECTORY=${DEVICE_DIRECTORY}" >> $GITHUB_ENV
+#                break
+#            fi
+#        done
+#        # Navigate to the parent directory
+#        cd ../
+#        # Create the necessary directories
+#        echo "Creating directory: $DEVICE_DIRECTORY"
+#        mkdir -p "$DEVICE_DIRECTORY"
+#        # Move device_tree folder to device_directory and rename it to $DEVICE_NAME
+#        echo "Moving device_tree to $DEVICE_DIRECTORY/$DEVICE_NAME"
+#        mv device_tree "$DEVICE_DIRECTORY"/"$DEVICE_NAME"
 
     - name: Clone Device Common Tree
       run: |
@@ -176,7 +175,7 @@ jobs:
         cd android-recovery
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
-        lunch ${{ env.DEVICE_MAKEFILE }}-eng && make clean && mka ${{ inputs.BUILD_TARGET }}image -j$(nproc --all)
+        lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && mka ${{ inputs.BUILD_TARGET }}image -j$(nproc --all)
         echo "Done building your ${{ inputs.BUILD_TARGET }}.img"
 
     - name: Set build target for upload
@@ -197,16 +196,15 @@ jobs:
       uses: softprops/action-gh-release@master
       with:
         files: |
-          android-recovery/out/target/product/${{ env.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}.img
-          android-recovery/out/target/product/${{ env.DEVICE_NAME }}/SHRP*.zip
-          android-recovery/out/target/product/${{ env.DEVICE_NAME }}/ramdisk-recovery.*
-        name: Unofficial SHRP For ${{ env.DEVICE_NAME }} // ${{ env.BUILD_DATE }}
+          android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}.img
+          android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/SHRP*.zip
+          android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/ramdisk-recovery.*
+        name: Unofficial SHRP_${{ github.event.inputs.DEVICE_NAME }}_${{ env.BUILD_DATE }}
         tag_name: ${{ github.run_id }}
         body: |
           Build: ${{ inputs.MANIFEST_BRANCH }}
           Device: [Device Tree/Branch](${{ inputs.DEVICE_TREE }}/tree/${{ inputs.DEVICE_TREE_BRANCH }})
-          Commit: Most recent [commit](${{ inputs.DEVICE_TREE }}/commit/${{ env.COMMIT_ID }}) during building.
-
+          
 #    - name: Run LDCheck
 #      if: inputs.LDCHECK == 'true'
 #      run: |
