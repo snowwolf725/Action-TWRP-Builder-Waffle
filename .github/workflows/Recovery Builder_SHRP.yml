@@ -22,7 +22,7 @@ on:
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'android-12.1'
+        default: 'shrp-12.1'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
