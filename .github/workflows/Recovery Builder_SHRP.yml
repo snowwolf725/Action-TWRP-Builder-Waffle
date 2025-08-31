@@ -223,8 +223,8 @@ jobs:
         name: Unofficial SHRP_${{ github.event.inputs.DEVICE_NAME }}_${{ env.BUILD_DATE }}
         tag_name: ${{ github.run_id }}
         body: |
-          Build: ${{ inputs.MANIFEST_BRANCH }}
-          Device: [Device Tree/Branch](${{ inputs.DEVICE_TREE }}/tree/${{ inputs.DEVICE_TREE_BRANCH }})
+          Device: ${{ inputs.MANIFEST_BRANCH }}
+          Target: Android 14/15/16
           
 #    - name: Run LDCheck
 #      if: inputs.LDCHECK == 'true'
