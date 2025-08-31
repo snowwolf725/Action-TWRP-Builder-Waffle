@@ -221,7 +221,7 @@ jobs:
           android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/SHRP*.zip
           android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/ramdisk-recovery.*
         name: Unofficial SHRP_${{ github.event.inputs.DEVICE_NAME }}_${{ env.BUILD_DATE }}
-        tag_name: ${{ github.run_id }}
+        tag_name: SHRP_${{ github.event.inputs.DEVICE_NAME }}_${{ env.BUILD_DATE }}
         body: |
           Device: ${{ inputs.MANIFEST_BRANCH }}
           Target: Android 14/15/16
