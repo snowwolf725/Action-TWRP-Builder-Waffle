@@ -170,6 +170,16 @@ jobs:
       run: |
         sudo apt-get install python2 python-is-python2
 
+    - name: Set build target for upload
+      run: |
+        if [ ${{ inputs.BUILD_TARGET }} == 'recovery' ]; then
+           echo "BUILD_TARGET_NAME=recovery" >> $GITHUB_ENV
+        elif [ ${{ inputs.BUILD_TARGET }} == 'boot' ]; then
+           echo "BUILD_TARGET_NAME=boot" >> $GITHUB_ENV
+        else
+           echo "BUILD_TARGET_NAME=vendor_boot" >> $GITHUB_ENV
+        fi
+    
     - name: Patch files
       run: |
         cd android-recovery/bootable/recovery/gui/theme/extra-languages/languages/
@@ -198,16 +208,6 @@ jobs:
         echo "Done building your ${{ inputs.BUILD_TARGET }}.img"
         cp android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}.img android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}_dark.img
         
-    - name: Set build target for upload
-      run: |
-        if [ ${{ inputs.BUILD_TARGET }} == 'recovery' ]; then
-           echo "BUILD_TARGET_NAME=recovery" >> $GITHUB_ENV
-        elif [ ${{ inputs.BUILD_TARGET }} == 'boot' ]; then
-           echo "BUILD_TARGET_NAME=boot" >> $GITHUB_ENV
-        else
-           echo "BUILD_TARGET_NAME=vendor_boot" >> $GITHUB_ENV
-        fi
-
     - name: Set Build Date # Output will be use in Release
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
