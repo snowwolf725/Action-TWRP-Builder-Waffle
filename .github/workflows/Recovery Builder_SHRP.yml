@@ -170,6 +170,11 @@ jobs:
       run: |
         sudo apt-get install python2 python-is-python2
 
+    - name: Patch files
+      run: |
+        cd android-recovery/bootable/recovery/gui/theme/extra-languages/languages/
+        cp ${GITHUB_WORKSPACE}/patch/zh_CN.xml .
+
     - name: Building SkyHawk
       run: |
         cd android-recovery
