@@ -175,14 +175,29 @@ jobs:
         cd android-recovery/bootable/recovery/gui/theme/extra-languages/languages/
         cp ${GITHUB_WORKSPACE}/patch/zh_CN.xml .
 
-    - name: Building SkyHawk
+    - name: Building SkyHawk light
       run: |
         cd android-recovery
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && mka ${{ inputs.BUILD_TARGET }}image -j$(nproc --all)
         echo "Done building your ${{ inputs.BUILD_TARGET }}.img"
-
+        cp android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}.img android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}_light.img
+          
+    - name: Setup SkyHawk dark
+      run: |
+        cd android-recovery
+        echo "SHRP_DARK := true" >> ${{ github.event.inputs.DEVICE_PATH }}/${{ github.event.inputs.MAKEFILE_NAME }}.mk
+        
+    - name: Building SkyHawk Dark
+      run: |
+        cd android-recovery
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && mka ${{ inputs.BUILD_TARGET }}image -j$(nproc --all)
+        echo "Done building your ${{ inputs.BUILD_TARGET }}.img"
+        cp android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}.img android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}_dark.img
+        
     - name: Set build target for upload
       run: |
         if [ ${{ inputs.BUILD_TARGET }} == 'recovery' ]; then
@@ -201,7 +216,8 @@ jobs:
       uses: softprops/action-gh-release@master
       with:
         files: |
-          android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}.img
+          android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}_light.img
+          android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ env.BUILD_TARGET_NAME }}_dark.img
           android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/SHRP*.zip
           android-recovery/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/ramdisk-recovery.*
         name: Unofficial SHRP_${{ github.event.inputs.DEVICE_NAME }}_${{ env.BUILD_DATE }}
