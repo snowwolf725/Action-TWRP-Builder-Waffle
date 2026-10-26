@@ -1,4 +1,4 @@
-name: Recovery Build(TWRP)
+name: Recovery Build(YARP)
 
 on:
   workflow_dispatch:
