@@ -181,6 +181,7 @@ jobs:
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/001-ota-install-mod.patch
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/002-add-metatdata-to-backup-list.patch
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-decrypt.patch
+        git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/004-fixed-fresh-rate.patch
         cd ../../system/vold
         git apply --whitespace=nowarn ${GITHUB_WORKSPACE}/patch/003-fix-decrypt2.patch
         cd ../../
