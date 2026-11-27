@@ -1,0 +1,50 @@
+diff --git a/minuitwrp/graphics_drm.cpp b/minuitwrp/graphics_drm.cpp
+index 99ebd28..6420111 100644
+--- a/minuitwrp/graphics_drm.cpp
++++ b/minuitwrp/graphics_drm.cpp
+@@ -638,6 +638,29 @@ static drmModeConnector *find_main_monitor(int fd, drmModeRes *resources,
+         }
+     }
+ 
++#if defined(AERA_DRM_FIXED_REFRESH_RATE) && AERA_DRM_FIXED_REFRESH_RATE > 0
++    const uint32_t preferred_mode = *mode_index;
++    const drmModeModeInfo& preferred =
++        main_monitor_connector->modes[preferred_mode];
++    for (int modes = 0; modes < main_monitor_connector->count_modes; modes++) {
++        const drmModeModeInfo& candidate =
++            main_monitor_connector->modes[modes];
++        printf("display mode candidate %d: %dx%d @ %d Hz, hskew=%d%s\n",
++               modes, candidate.hdisplay, candidate.vdisplay,
++               candidate.vrefresh, candidate.hskew,
++               modes == static_cast<int>(preferred_mode) ? " preferred" : "");
++        if (candidate.hdisplay == preferred.hdisplay &&
++            candidate.vdisplay == preferred.vdisplay &&
++            candidate.vrefresh == AERA_DRM_FIXED_REFRESH_RATE &&
++            candidate.hskew == 0) {
++            *mode_index = modes;
++            break;
++        }
++    }
++    printf("AERA fixed DRM refresh request: %d Hz; selected mode %u\n",
++           AERA_DRM_FIXED_REFRESH_RATE, *mode_index);
++#endif
++
+     return main_monitor_connector;
+ }
+ 
+diff --git a/minuitwrp/libminuitwrp_defaults.go b/minuitwrp/libminuitwrp_defaults.go
+index a09999d..b49bc54 100644
+--- a/minuitwrp/libminuitwrp_defaults.go
++++ b/minuitwrp/libminuitwrp_defaults.go
+@@ -11,6 +11,10 @@ import (
+ func globalFlags(ctx android.BaseContext) []string {
+ 	var cflags []string
+ 
++	if fixedRefreshRate := getMakeVars(ctx, "AERA_DRM_FIXED_REFRESH_RATE"); fixedRefreshRate != "" {
++		cflags = append(cflags, "-DAERA_DRM_FIXED_REFRESH_RATE="+fixedRefreshRate)
++	}
++
+ 	matches, err := filepath.Glob("external/libdrm/Android.*")
+ 	_ = matches
+ 	if err == nil {
+  
