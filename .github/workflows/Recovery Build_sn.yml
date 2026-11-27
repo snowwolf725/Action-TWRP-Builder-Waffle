@@ -86,6 +86,7 @@ jobs:
     - name: Check Out
       uses: actions/checkout@v4
 
+#linux-modules-extra-$(uname -r) \
     # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
@@ -95,7 +96,6 @@ jobs:
       run: |
         sudo apt update && sudo apt upgrade -y
         DEBIAN_FRONTEND=noninteractive sudo apt install -yq \
-            linux-modules-extra-$(uname -r) \
             gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib \
             libc6-dev lib32ncurses-dev x11proto-core-dev libx11-dev tree lib32z-dev libgl1-mesa-dev libxml2-utils \
             xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses-dev libsdl1.2-dev \
